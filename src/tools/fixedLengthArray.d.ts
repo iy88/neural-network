@@ -1,0 +1,1 @@
+declare type fixedLengthArray<ArrayType, length extends number> = [ArrayType, ...ArrayType[]] & { length }
