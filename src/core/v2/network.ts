@@ -11,6 +11,7 @@ class Network {
   }
 
   load(model: anyObject[]) {
+    this.layers = [];
     for (let layer of model) {
       let neurons: Neuron[] = [];
       let activationFunction: undefined | Function = undefined;
@@ -58,9 +59,9 @@ class Network {
           eachLayerOutPut.push(this.layers[i].feedforward(eachLayerOutPut[eachLayerOutPut.length - 1]));
         }
         // computing partial derivative
-        let partialDerivative: numberArray = [];
+        let partialDerivative: numberArray[] = [];
         for (let i = 0; i < y.length; i++) {
-          partialDerivative.push(learningRate * (eachLayerOutPut[eachLayerOutPut.length - 1][i] - y[i]))
+          partialDerivative.push([learningRate * (eachLayerOutPut[eachLayerOutPut.length - 1][i] - y[i])]);
         }
         for (let i = this.layers.length - 1; i > -1; i--) {
           partialDerivative = this.layers[i].backward(eachLayerOutPut[i - 1] || inputs, partialDerivative);
@@ -70,12 +71,12 @@ class Network {
     }
   }
 
-  fit(trainingData: { input: numberArray, output: numberArray }[], testingData: { input: numberArray, output: numberArray }[], learningRate: number, patient: number) {
+  fit(trainingData: { input: numberArray, output: numberArray }[], testingData: { input: numberArray, output: numberArray }[], learningRate: number, patient: number, trainingTime: number) {
     let trainingDataCopy: { input: numberArray, output: numberArray }[] = trainingData.slice(0);
     let allEpochLoss: numberArray = [];
     let startPatientCount = false;
     let patientValue = 0;
-    for (; ;) {
+    for (let epoch = 1; epoch <= trainingTime; epoch++) {
       // using SGD
       for (let data of trainingDataCopy) {
         let inputs: numberArray = data.input;
@@ -85,9 +86,9 @@ class Network {
           eachLayerOutPut.push(this.layers[i].feedforward(eachLayerOutPut[eachLayerOutPut.length - 1]));
         }
         // computing partial derivative
-        let partialDerivative: numberArray = [];
+        let partialDerivative: numberArray[] = [];
         for (let i = 0; i < y.length; i++) {
-          partialDerivative.push(learningRate * (eachLayerOutPut[eachLayerOutPut.length - 1][i] - y[i]))
+          partialDerivative.push([learningRate * (eachLayerOutPut[eachLayerOutPut.length - 1][i] - y[i])]);
         }
         for (let i = this.layers.length - 1; i > -1; i--) {
           partialDerivative = this.layers[i].backward(eachLayerOutPut[i - 1] || inputs, partialDerivative);

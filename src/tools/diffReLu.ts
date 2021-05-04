@@ -1,3 +1,3 @@
-export default function diffReLu(x:number):number{
+export default function diffReLU(x:number):number{
   return x > 0 ? 1 : 0
 }

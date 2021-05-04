@@ -1,3 +1,3 @@
-export default function ReLU(z:number):number{
-  return z > 0 ? z : 0;
+export default function ReLU(z: number): number {
+  return Math.max(0, z)
 }

@@ -1,4 +1,3 @@
-import sum from "../../tools/sum";
 import Neuron from "./neuron";
 
 class Layer {
@@ -30,9 +29,9 @@ class Layer {
     return results
   }
 
-  backward(inputs: numberArray, derivatives: numberArray) {
+  backward(inputs: numberArray, derivatives: numberArray[]) {
     let lastWeights: numberArray[] = [];
-    let newDerivatives: numberArray = [];
+    let newDerivatives: numberArray[] = [];
     let derivativesOfActivationFunction: numberArray = [];
     if (this.derivativeOfActivationFunction && this.activationFunction) {
       for (let out of this.lastOut) {
@@ -40,26 +39,33 @@ class Layer {
       }
     }
 
-    let d = sum(derivatives);
     for (let i = 0; i < this.neurons.length; i++) {
-      let nd = d;
+      let d = 0;
+      for (let j = 0; j < derivatives.length; j++) {
+        d += derivatives[j][i];
+      }
       if (derivativesOfActivationFunction.length !== 0) {
-        nd *= derivativesOfActivationFunction[i];
+        d *= derivativesOfActivationFunction[i];
       }
-      lastWeights.push(this.neurons[i].backward(inputs, nd));
+      lastWeights.push(this.neurons[i].backward(inputs, d));
     }
 
-    let tempDerivatives: numberArray[] = []
-    for (let i = 0; i < this.neurons.length; i++) {
-      tempDerivatives[i] = [];
+    let temp: numberArray[] = [];
+    for (let i = 0; i < lastWeights.length; i++) {
+      temp[i] = [];
       for (let j = 0; j < lastWeights[i].length; j++) {
-        tempDerivatives[i][j] = (lastWeights[i][j] * d);
+        let d = 0;
+        for (let j = 0; j < derivatives.length; j++) {
+          d += derivatives[j][i];
+        }
+        if (derivativesOfActivationFunction.length !== 0) {
+          d *= derivativesOfActivationFunction[i];
+        }
+        temp[i][j] = d * lastWeights[i][j];
       }
     }
 
-    for (let i = 0; i < tempDerivatives.length; i++) {
-      newDerivatives.push(sum(tempDerivatives[i]));
-    }
+    newDerivatives = temp;
 
     return newDerivatives
   }
