@@ -10,7 +10,7 @@ class Neuron {
       this.bias = weights!.slice(-1)[0];
     } else {
       for (let i = 0; i < shape; i++) {
-        this.weigths.push(Math.random());
+        this.weigths.push(1);
       }
     }
   }

@@ -55,8 +55,8 @@ class Layer {
       temp[i] = [];
       for (let j = 0; j < lastWeights[i].length; j++) {
         let d = 0;
-        for (let j = 0; j < derivatives.length; j++) {
-          d += derivatives[j][i];
+        for (let k = 0; k < derivatives.length; k++) {
+          d += derivatives[k][i];
         }
         if (derivativesOfActivationFunction.length !== 0) {
           d *= derivativesOfActivationFunction[i];
