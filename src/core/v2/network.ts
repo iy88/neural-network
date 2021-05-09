@@ -108,11 +108,11 @@ class Network {
         for (let i = 1; i < this.layers.length; i++) {
           eachLayerOutPut.push(this.layers[i].feedforward(eachLayerOutPut[eachLayerOutPut.length - 1]));
         }
-        let partialDerivative: numberArray = [];
+        let temp: numberArray = [];
         for (let i = 0; i < y.length; i++) {
-          partialDerivative.push((this.lossFunctions[this.loss] as { function: Function, derivative: Function }).derivative(eachLayerOutPut[eachLayerOutPut.length - 1][i], y[i]));
+          temp.push(Math.abs((this.lossFunctions[this.loss] as { function: Function, derivative: Function }).derivative(eachLayerOutPut[eachLayerOutPut.length - 1][i], y[i])));
         }
-        let loss = sum(partialDerivative) / partialDerivative.length;
+        let loss = sum(temp) / temp.length;
         allLoss.push(loss);
       }
       allEpochLoss.push(sum(allLoss) / allLoss.length);
