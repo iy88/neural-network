@@ -13,9 +13,9 @@ class Layer {
   private activationFunctionName: string | void = undefined;
   private activations: { [key: string]: { function: Function | undefined, derivative: Function | undefined } } = {
     'relu': { function: ReLU, derivative: diffReLU },
-    'sigmod': { function: sigmoid, derivative: diffSigmoid },
+    'sigmoid': { function: sigmoid, derivative: diffSigmoid },
     'none': { function: undefined, derivative: undefined }
-  }
+  };
 
   constructor(shape: number, quant: number, activationFunction: 'none' | 'relu' | 'sigmoid' = 'none', neurons?: Neuron[]) {
     this.activationFunctionName = activationFunction;

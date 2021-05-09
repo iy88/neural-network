@@ -1,3 +1,7 @@
+import crossEntropy from "../../tools/crossEntropy";
+import diffCrossEntropy from "../../tools/diffCrossEntropy";
+import diffMse from "../../tools/diffMse";
+import mse from "../../tools/mse";
 import shuffle from "../../tools/shuffle";
 import sum from "../../tools/sum";
 import Layer from "./layer";
@@ -5,14 +9,22 @@ import Neuron from "./neuron";
 
 class Network {
   private layers: Layer[] = [];
+  private loss: 'mse' | 'crossEntropy' = 'mse';
+  private lossFunctions: { [key: string]: { function: Function | undefined, derivative: Function | undefined } } = {
+    'mse': { function: mse, derivative: diffMse },
+    'crossEntropy': { function: crossEntropy, derivative: diffCrossEntropy }
+  };
 
-  constructor(layers?: Layer[]) {
+
+  constructor(loss: 'mse' | 'crossEntropy' = 'mse', layers?: Layer[]) {
+    this.loss = loss;
     layers ? layers.length !== 0 ? this.layers = layers : '' : ''
   }
 
-  load(model: anyObject[]) {
+  load(model: { configs: anyObject[], loss: 'mse' | 'crossEntropy' }) {
     this.layers = [];
-    for (let layer of model) {
+    this.loss = model.loss;
+    for (let layer of model.configs) {
       let neurons: Neuron[] = [];
       for (let neuron of layer.neurons) {
         neurons.push(new Neuron(0, [...neuron.weigths, neuron.bias]));
@@ -55,7 +67,7 @@ class Network {
         // computing partial derivative
         let partialDerivative: numberArray[] = [];
         for (let i = 0; i < y.length; i++) {
-          partialDerivative.push([learningRate * (eachLayerOutPut[eachLayerOutPut.length - 1][i] - y[i])]);
+          partialDerivative.push([learningRate * (this.lossFunctions[this.loss] as { function: Function, derivative: Function }).derivative(eachLayerOutPut[eachLayerOutPut.length - 1][i], y[i])]);
         }
         for (let i = this.layers.length - 1; i > -1; i--) {
           partialDerivative = this.layers[i].backward(eachLayerOutPut[i - 1] || inputs, partialDerivative);
@@ -82,7 +94,7 @@ class Network {
         // computing partial derivative
         let partialDerivative: numberArray[] = [];
         for (let i = 0; i < y.length; i++) {
-          partialDerivative.push([learningRate * (eachLayerOutPut[eachLayerOutPut.length - 1][i] - y[i])]);
+          partialDerivative.push([learningRate * (this.lossFunctions[this.loss] as { function: Function, derivative: Function }).derivative(eachLayerOutPut[eachLayerOutPut.length - 1][i], y[i])]);
         }
         for (let i = this.layers.length - 1; i > -1; i--) {
           partialDerivative = this.layers[i].backward(eachLayerOutPut[i - 1] || inputs, partialDerivative);
@@ -98,7 +110,7 @@ class Network {
         }
         let partialDerivative: numberArray = [];
         for (let i = 0; i < y.length; i++) {
-          partialDerivative.push(0.5 * Math.pow(eachLayerOutPut[eachLayerOutPut.length - 1][i] - y[i], 2));
+          partialDerivative.push((this.lossFunctions[this.loss] as { function: Function, derivative: Function }).derivative(eachLayerOutPut[eachLayerOutPut.length - 1][i], y[i]));
         }
         let loss = sum(partialDerivative) / partialDerivative.length;
         allLoss.push(loss);
@@ -126,7 +138,7 @@ class Network {
     for (let layer of this.layers) {
       configs.push(layer.snapshot());
     }
-    return configs;
+    return { configs, loss: this.loss };
   }
 
 }
