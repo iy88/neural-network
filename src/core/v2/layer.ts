@@ -1,4 +1,8 @@
 import Neuron from "./neuron";
+import ReLU from "../../tools/ReLU";
+import diffReLU from "../../tools/diffReLU";
+import sigmoid from "../../tools/sigmoid";
+import diffSigmoid from "../../tools/diffSigmoid";
 
 class Layer {
   private neurons: Neuron[] = [];
@@ -6,10 +10,17 @@ class Layer {
   private derivativeOfActivationFunction: Function | void = undefined;
   private lastOut: numberArray = [];
   private shape: number = 0;
+  private activationFunctionName: string | void = undefined;
+  private activations: { [key: string]: { function: Function | undefined, derivative: Function | undefined } } = {
+    'relu': { function: ReLU, derivative: diffReLU },
+    'sigmod': { function: sigmoid, derivative: diffSigmoid },
+    'none': { function: undefined, derivative: undefined }
+  }
 
-  constructor(shape: number, quant: number, activationFunction?: Function, derivativeOfActivationFunction?: Function, neurons?: Neuron[]) {
-    this.activationFunction = activationFunction;
-    this.derivativeOfActivationFunction = derivativeOfActivationFunction;
+  constructor(shape: number, quant: number, activationFunction: 'none' | 'relu' | 'sigmoid' = 'none', neurons?: Neuron[]) {
+    this.activationFunctionName = activationFunction;
+    this.activationFunction = this.activations[activationFunction].function;
+    this.derivativeOfActivationFunction = this.activations[activationFunction].derivative;
     this.shape = shape;
     if (neurons && neurons.length !== 0) {
       this.neurons = neurons as Neuron[];
@@ -33,12 +44,15 @@ class Layer {
     let lastWeights: numberArray[] = [];
     let newDerivatives: numberArray[] = [];
     let derivativesOfActivationFunction: numberArray = [];
+
+    // compute derivative of activation function, if have activation function
     if (this.derivativeOfActivationFunction && this.activationFunction) {
       for (let out of this.lastOut) {
         derivativesOfActivationFunction.push(this.derivativeOfActivationFunction(out));
       }
     }
 
+    // feedback to neurons
     for (let i = 0; i < this.neurons.length; i++) {
       let d = 0;
       for (let j = 0; j < derivatives.length; j++) {
@@ -50,9 +64,9 @@ class Layer {
       lastWeights.push(this.neurons[i].backward(inputs, d));
     }
 
-    let temp: numberArray[] = [];
+    // compute next derivatives
     for (let i = 0; i < lastWeights.length; i++) {
-      temp[i] = [];
+      newDerivatives[i] = [];
       for (let j = 0; j < lastWeights[i].length; j++) {
         let d = 0;
         for (let k = 0; k < derivatives.length; k++) {
@@ -61,21 +75,16 @@ class Layer {
         if (derivativesOfActivationFunction.length !== 0) {
           d *= derivativesOfActivationFunction[i];
         }
-        temp[i][j] = d * lastWeights[i][j];
+        newDerivatives[i][j] = d * lastWeights[i][j];
       }
     }
-
-    newDerivatives = temp;
 
     return newDerivatives
   }
 
   snapshot() {
     let res: anyObject = { shape: this.shape, neurons: [] };
-    if (this.activationFunction && this.derivativeOfActivationFunction) {
-      res.activationFunction = this.activationFunction.toString();
-      res.derivativeOfActivationFunction = this.derivativeOfActivationFunction.toString();
-    }
+    res.activationFunction = this.activationFunctionName;
     for (let neuron of this.neurons) {
       res.neurons.push(neuron.snapshot());
     }

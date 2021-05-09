@@ -14,21 +14,15 @@ class Network {
     this.layers = [];
     for (let layer of model) {
       let neurons: Neuron[] = [];
-      let activationFunction: undefined | Function = undefined;
-      let derivativeOfActivationFunction: undefined | Function = undefined;
       for (let neuron of layer.neurons) {
         neurons.push(new Neuron(0, [...neuron.weigths, neuron.bias]));
       }
-      if (layer.activationFunction) {
-        activationFunction = eval('(()=>{return ' + layer.activationFunction + '})()');
-        derivativeOfActivationFunction = eval('(()=>{return ' + layer.derivativeOfActivationFunction + '})()');
-      }
-      this.addLayer(layer.shape, neurons.length, activationFunction, derivativeOfActivationFunction, neurons);
+      this.addLayer(layer.shape, neurons.length, layer.activationFunction, neurons);
     }
   }
 
-  addLayer(shape: number, quant: number, activationFunction?: Function, derivativeOfActivationFunction?: Function, neurons?: Neuron[]) {
-    this.layers.push(new Layer(shape, quant, activationFunction, derivativeOfActivationFunction, neurons));
+  addLayer(shape: number, quant: number, activationFunction: 'none' | 'relu' | 'sigmoid' = 'none', neurons?: Neuron[]) {
+    this.layers.push(new Layer(shape, quant, activationFunction, neurons));
   }
 
   removeLayer(index?: number) {
