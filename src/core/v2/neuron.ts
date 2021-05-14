@@ -39,3 +39,4 @@ class Neuron {
 
 
 export default Neuron;
+module.exports = Neuron;
