@@ -69,6 +69,7 @@ class Network {
         for (let i = 0; i < y.length; i++) {
           partialDerivative.push([learningRate * (this.lossFunctions[this.loss] as { function: Function, derivative: Function }).derivative(eachLayerOutPut[eachLayerOutPut.length - 1][i], y[i])]);
         }
+
         for (let i = this.layers.length - 1; i > -1; i--) {
           partialDerivative = this.layers[i].backward(eachLayerOutPut[i - 1] || inputs, partialDerivative);
         }
