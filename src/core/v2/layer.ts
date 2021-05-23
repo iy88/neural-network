@@ -3,7 +3,6 @@ import ReLU from "../../tools/ReLU";
 import diffReLU from "../../tools/diffReLU";
 import sigmoid from "../../tools/sigmoid";
 import diffSigmoid from "../../tools/diffSigmoid";
-import sum from "../../tools/sum";
 
 class Layer {
   private neurons: Neuron[] = [];
@@ -54,33 +53,29 @@ class Layer {
     }
 
     // feedback to neurons
-    {
+    for (let i = 0; i < this.neurons.length; i++) {
       let d = 0;
       for (let j = 0; j < derivatives.length; j++) {
-        d += sum(derivatives[j]);
+        d += derivatives[j][i];
       }
-      for (let i = 0; i < this.neurons.length; i++) {
-        let td = d;
-        if (derivativesOfActivationFunction.length !== 0) {
-          td *= derivativesOfActivationFunction[i];
-        }
-        lastWeights.push(this.neurons[i].backward(inputs, td));
+      if (derivativesOfActivationFunction.length !== 0) {
+        d *= derivativesOfActivationFunction[i];
       }
+      lastWeights.push(this.neurons[i].backward(inputs, d));
     }
 
     // compute next derivatives
     for (let i = 0; i < lastWeights.length; i++) {
       newDerivatives[i] = [];
-      let d = 0;
-      for (let k = 0; k < derivatives.length; k++) {
-        d += sum(derivatives[k]);
-      }
       for (let j = 0; j < lastWeights[i].length; j++) {
-        let td = d;
-        if (derivativesOfActivationFunction.length !== 0) {
-          td *= derivativesOfActivationFunction[i];
+        let d = 0;
+        for (let k = 0; k < derivatives.length; k++) {
+          d += derivatives[k][i];
         }
-        newDerivatives[i][j] = td * lastWeights[i][j];
+        if (derivativesOfActivationFunction.length !== 0) {
+          d *= derivativesOfActivationFunction[i];
+        }
+        newDerivatives[i][j] = d * lastWeights[i][j];
       }
     }
 
