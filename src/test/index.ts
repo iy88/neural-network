@@ -1,14 +1,15 @@
 import { writeFileSync } from "fs";
 import Network from "../core/v2/network";
 // import sum from "../tools/sum";
-let n = new Network('crossEntropy');
-n.addLayer(2, 2, 'relu');
-n.addLayer(2, 1, 'sigmoid');
+let n = new Network('mse');
+n.addLayer(2, 2);
+n.addLayer(2, 2);
+n.addLayer(2, 2);
 let trainingData: { input: numberArray; output: numberArray; }[] = [
-  { input: [1, 0], output: [1] },
-  { input: [0, 1], output: [1] },
-  { input: [0, 0], output: [0] },
-  { input: [1, 1], output: [0] }
+  { input: [1, 1], output: [2,4] },
+  // { input: [0, 1], output: [1] },
+  // { input: [0, 0], output: [0] },
+  // { input: [1, 1], output: [0] }
 ];
 // let testingData:{input:numberArray,output:numberArray}[] = [
 //   { input: [5], output: [5] },
@@ -24,7 +25,7 @@ let trainingData: { input: numberArray; output: numberArray; }[] = [
 // }
 // console.log(trainingData);
 // console.time();
-n.train(trainingData, 1e-1, 100000);
+n.train(trainingData, 1e-1, 1000);
 for (let i of trainingData) {
   console.log(n.feedforward(i.input), i.output);
 }

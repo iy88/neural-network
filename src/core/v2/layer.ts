@@ -1,6 +1,6 @@
 import Neuron from "./neuron";
 import ReLU from "../../tools/ReLU";
-import diffReLU from "../../tools/diffReLU";
+import diffReLU from "../../tools/diffReLu";
 import sigmoid from "../../tools/sigmoid";
 import diffSigmoid from "../../tools/diffSigmoid";
 

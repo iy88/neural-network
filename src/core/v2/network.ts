@@ -65,9 +65,9 @@ class Network {
           eachLayerOutPut.push(this.layers[i].feedforward(eachLayerOutPut[eachLayerOutPut.length - 1]));
         }
         // computing partial derivative
-        let partialDerivative: numberArray[] = [];
+        let partialDerivative: numberArray[] = [[]];
         for (let i = 0; i < y.length; i++) {
-          partialDerivative.push([learningRate * (this.lossFunctions[this.loss] as { function: Function, derivative: Function }).derivative(eachLayerOutPut[eachLayerOutPut.length - 1][i], y[i])]);
+          partialDerivative[0].push(learningRate * (this.lossFunctions[this.loss] as { function: Function, derivative: Function }).derivative(eachLayerOutPut[eachLayerOutPut.length - 1][i], y[i]));
         }
 
         for (let i = this.layers.length - 1; i > -1; i--) {
@@ -93,9 +93,9 @@ class Network {
           eachLayerOutPut.push(this.layers[i].feedforward(eachLayerOutPut[eachLayerOutPut.length - 1]));
         }
         // computing partial derivative
-        let partialDerivative: numberArray[] = [];
+        let partialDerivative: numberArray[] = [[]];
         for (let i = 0; i < y.length; i++) {
-          partialDerivative.push([learningRate * (this.lossFunctions[this.loss] as { function: Function, derivative: Function }).derivative(eachLayerOutPut[eachLayerOutPut.length - 1][i], y[i])]);
+          partialDerivative[0].push(learningRate * (this.lossFunctions[this.loss] as { function: Function, derivative: Function }).derivative(eachLayerOutPut[eachLayerOutPut.length - 1][i], y[i]));
         }
         for (let i = this.layers.length - 1; i > -1; i--) {
           partialDerivative = this.layers[i].backward(eachLayerOutPut[i - 1] || inputs, partialDerivative);
