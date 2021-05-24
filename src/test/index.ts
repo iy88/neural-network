@@ -3,10 +3,13 @@ import Network from "../core/v2/network";
 // import sum from "../tools/sum";
 let n = new Network('mse');
 n.addLayer(2, 2);
-n.addLayer(2, 2);
-n.addLayer(2, 2);
+// n.addLayer(2, 2);
+// n.addLayer(2, 2);
 let trainingData: { input: numberArray; output: numberArray; }[] = [
-  { input: [1, 1], output: [2,4] },
+  { input: [1, 1], output: [2, 4] },
+  { input: [1, 2], output: [2, 8] },
+  { input: [2, 1], output: [4, 4] },
+  { input: [2, 2], output: [4, 8] }
   // { input: [0, 1], output: [1] },
   // { input: [0, 0], output: [0] },
   // { input: [1, 1], output: [0] }
@@ -25,7 +28,7 @@ let trainingData: { input: numberArray; output: numberArray; }[] = [
 // }
 // console.log(trainingData);
 // console.time();
-n.train(trainingData, 1e-1, 1000);
+n.train(trainingData, 1e-3, 100000);
 for (let i of trainingData) {
   console.log(n.feedforward(i.input), i.output);
 }
