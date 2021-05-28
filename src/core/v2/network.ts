@@ -29,12 +29,16 @@ class Network {
       for (let neuron of layer.neurons) {
         neurons.push(new Neuron(0, [...neuron.weigths, neuron.bias]));
       }
-      this.addLayer(layer.shape, neurons.length, layer.activationFunction, neurons);
+      this.addLayer({ shape: layer.shape, quant: neurons.length, activationFunction: layer.activationFunction, neurons });
     }
   }
 
-  addLayer(shape: number, quant: number, activationFunction: 'none' | 'relu' | 'sigmoid' = 'none', neurons?: Neuron[]) {
-    this.layers.push(new Layer(shape, quant, activationFunction, neurons));
+  addLayer(config: { shape?: number, quant: number, activationFunction?: 'none' | 'relu' | 'sigmoid' | 'softmax', neurons?: Neuron[] }) {
+    if (this.layers.length > 0) {
+      this.layers.push(new Layer(this.layers.slice(-1)[0]._shape, config.quant, config.activationFunction || 'none', config.neurons));
+    } else {
+      this.layers.push(new Layer(config.shape as number, config.quant, config.activationFunction, config.neurons));
+    }
   }
 
   removeLayer(index?: number) {
@@ -55,8 +59,12 @@ class Network {
 
   train(trainingData: { input: numberArray, output: numberArray }[], learningRate: number, trainingTime: number) {
     let trainingDataCopy: { input: numberArray, output: numberArray }[] = trainingData.slice(0);
+    let trainingLoss: numberArray = [];
+    // let st = new Date().getTime();
     for (let epoch = 1; epoch <= trainingTime; epoch++) {
       // using SGD
+      // let st = new Date().getTime();
+      let epochLoss = [];
       for (let data of trainingDataCopy) {
         let inputs: numberArray = data.input;
         let y: numberArray = data.output;
@@ -65,17 +73,26 @@ class Network {
           eachLayerOutPut.push(this.layers[i].feedforward(eachLayerOutPut[eachLayerOutPut.length - 1]));
         }
         // computing partial derivative
+        let loss: numberArray = []
         let partialDerivative: numberArray[] = [[]];
         for (let i = 0; i < y.length; i++) {
           partialDerivative[0].push(learningRate * (this.lossFunctions[this.loss] as { function: Function, derivative: Function }).derivative(eachLayerOutPut[eachLayerOutPut.length - 1][i], y[i]));
+          loss.push((this.lossFunctions[this.loss] as { function: Function, derivative: Function }).function(eachLayerOutPut[eachLayerOutPut.length - 1][i], y[i]))
         }
-
+        epochLoss.push(sum(loss) / loss.length);
         for (let i = this.layers.length - 1; i > -1; i--) {
           partialDerivative = this.layers[i].backward(eachLayerOutPut[i - 1] || inputs, partialDerivative);
         }
       }
+      // let et = new Date().getTime();
+      let loss = Math.abs(sum(epochLoss) / epochLoss.length);
+      console.log(`epoch: ${epoch} loss: ${loss}`);
+      trainingLoss.push(loss);
       trainingDataCopy = shuffle(trainingDataCopy);
     }
+    // let et = new Date().getTime();
+    // console.log(`train cost(ms): ${et - st}`);
+    return trainingLoss
   }
 
   fit(trainingData: { input: numberArray, output: numberArray }[], testingData: { input: numberArray, output: numberArray }[], learningRate: number, patient: number, trainingTime: number) {
