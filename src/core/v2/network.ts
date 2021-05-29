@@ -85,7 +85,7 @@ class Network {
         }
       }
       let et = new Date().getTime();
-      let loss = Math.abs(sum(epochLoss) / epochLoss.length);
+      let loss = sum(epochLoss) / epochLoss.length;
       console.log(`epoch: ${epoch} loss: ${loss} cost(ms): ${et - st}`);
       trainingLoss.push(loss);
       trainingDataCopy = shuffle(trainingDataCopy);

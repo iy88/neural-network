@@ -2,8 +2,9 @@ import { writeFileSync } from "fs";
 import { readFileSync } from "fs";
 import Network from "../core/v2/network";
 // import hardmax from "../tools/activationFunctions/hardmax";
-let n = new Network('mse');
+let n = new Network('crossEntropy');
 n.addLayer({ shape: 1, quant: 10, activationFunction: 'relu' });
+// n.addLayer({ quant: 2, activationFunction: 'relu' });
 n.addLayer({ quant: 10, activationFunction: 'softmax' });
 let trainingData: { input: numberArray; output: numberArray; }[] = [
   // { input: [1, 1], output: [0,1] },
@@ -36,16 +37,16 @@ let trainingData: { input: numberArray; output: numberArray; }[] = [
 //   { input: [7], output: [0, 0, 0, 0, 0, 0, 0, 1, 0, 0] },
 //   { input: [8], output: [0, 0, 0, 0, 0, 0, 0, 0, 1, 0] },
 //   { input: [9], output: [0, 0, 0, 0, 0, 0, 0, 0, 0, 1] },
-  // { input: [1, 2], output: [3] },
-  // { input: [2, 2], output: [4] },
-  // { input: [2, 5], output: [7] },
-  // { input: [3, 6], output: [9] }
+// { input: [1, 2], output: [3] },
+// { input: [2, 2], output: [4] },
+// { input: [2, 5], output: [7] },
+// { input: [3, 6], output: [9] }
 // ]
 // let loss = n.fit(trainingData, testingData, .70, Infinity, 10000);
 n.load(JSON.parse(readFileSync('./model.json').toString()));
-// let loss = n.train(trainingData, 1, 10);
-n.train(trainingData, 1000, 1000000);
-// writeFileSync('./loss', loss.join('\n'), { flag: 'w+' });
+let loss = n.train(trainingData, 1e-2, 10000);
+// n.train(trainingData, 1000, 10000);
+writeFileSync('./loss', loss.join('\n'), { flag: 'w+' });
 for (let i of trainingData) {
   let inp = i.input;
   let nop = n.feedforward(inp);
