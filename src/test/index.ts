@@ -3,9 +3,9 @@ import { readFileSync } from "fs";
 import Network from "../core/v2/network";
 // import hardmax from "../tools/activationFunctions/hardmax";
 let n = new Network('crossEntropy');
-n.addLayer({ shape: 1, quant: 10, activationFunction: 'relu' });
+// n.addLayer({ shape: 1, quant: 10, activationFunction: 'relu' });
 // n.addLayer({ quant: 2, activationFunction: 'relu' });
-n.addLayer({ quant: 10, activationFunction: 'softmax' });
+n.addLayer({ shape: 1, quant: 10, activationFunction: 'softmax' });
 let trainingData: { input: numberArray; output: numberArray; }[] = [
   // { input: [1, 1], output: [0,1] },
   // { input: [1, 0], output: [1,0] },
@@ -44,7 +44,7 @@ let trainingData: { input: numberArray; output: numberArray; }[] = [
 // ]
 // let loss = n.fit(trainingData, testingData, .70, Infinity, 10000);
 n.load(JSON.parse(readFileSync('./model.json').toString()));
-let loss = n.train(trainingData, 1e-2, 10000);
+let loss = n.train(trainingData, 6e6, 10000);
 // n.train(trainingData, 1000, 10000);
 writeFileSync('./loss', loss.join('\n'), { flag: 'w+' });
 for (let i of trainingData) {
