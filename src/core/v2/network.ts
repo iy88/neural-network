@@ -60,10 +60,10 @@ class Network {
   train(trainingData: { input: numberArray, output: numberArray }[], learningRate: number, trainingTime: number) {
     let trainingDataCopy: { input: numberArray, output: numberArray }[] = trainingData.slice(0);
     let trainingLoss: numberArray = [];
-    // let st = new Date().getTime();
+    let st = new Date().getTime();
     for (let epoch = 1; epoch <= trainingTime; epoch++) {
       // using SGD
-      // let st = new Date().getTime();
+      let st = new Date().getTime();
       let epochLoss = [];
       for (let data of trainingDataCopy) {
         let inputs: numberArray = data.input;
@@ -84,14 +84,14 @@ class Network {
           partialDerivative = this.layers[i].backward(eachLayerOutPut[i - 1] || inputs, partialDerivative);
         }
       }
-      // let et = new Date().getTime();
+      let et = new Date().getTime();
       let loss = Math.abs(sum(epochLoss) / epochLoss.length);
-      console.log(`epoch: ${epoch} loss: ${loss}`);
+      console.log(`epoch: ${epoch} loss: ${loss} cost(ms): ${et - st}`);
       trainingLoss.push(loss);
       trainingDataCopy = shuffle(trainingDataCopy);
     }
-    // let et = new Date().getTime();
-    // console.log(`train cost(ms): ${et - st}`);
+    let et = new Date().getTime();
+    console.log(`train cost(ms): ${et - st}`);
     return trainingLoss
   }
 
