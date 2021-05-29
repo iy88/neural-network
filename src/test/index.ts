@@ -44,7 +44,7 @@ let trainingData: { input: numberArray; output: numberArray; }[] = [
 // let loss = n.fit(trainingData, testingData, .70, Infinity, 10000);
 n.load(JSON.parse(readFileSync('./model.json').toString()));
 // let loss = n.train(trainingData, 1, 10);
-n.train(trainingData, 1000, 10000);
+n.train(trainingData, 1000, 1000000);
 // writeFileSync('./loss', loss.join('\n'), { flag: 'w+' });
 for (let i of trainingData) {
   let inp = i.input;
